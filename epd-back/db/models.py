@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.core.validators import FileExtensionValidator
 from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
@@ -7,7 +8,8 @@ from django.utils.translation import gettext_lazy as _
 
 class Email(models.Model):
 
-    file = models.FileField(_("file"), upload_to='emails/')
+    file = models.FileField(_("file"), upload_to='emails/',
+                            validators=[FileExtensionValidator(['eml'])])
 
     class Meta:
         verbose_name = _("email")
