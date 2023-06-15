@@ -5,7 +5,7 @@ import type { Email } from '../types/email'
 // Define a service using a base URL and expected endpoints
 export const emailApi = createApi({
   reducerPath: 'emailApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://127.0.0.1/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: backendHost }),
   endpoints: (builder) => ({
     getEmails: builder.query<Array<Email>, string>({
       query: () => `emails/`,
