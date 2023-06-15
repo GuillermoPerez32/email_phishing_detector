@@ -1,10 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
-// ...
+import { emailApi } from '../services/email';
 
 export const store = configureStore({
   reducer: {
-    posts: emailsReducer,
+    // Add the generated reducer as a specific top-level slice
+    [emailApi.reducerPath]: emailApi.reducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(emailApi.middleware),
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
