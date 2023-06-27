@@ -14,6 +14,15 @@ export const emailApi = createApi({
     getEmailById: builder.query<Email, string>({
       query: (id) => `emails/${id}`,
     }),
+    addEmail: builder.mutation<Email, Partial<Email>>({
+      query(body) {
+        return {
+          url: `emails`,
+          method: 'POST',
+          body,
+        }
+      },
+    }),
   }),
 })
 
