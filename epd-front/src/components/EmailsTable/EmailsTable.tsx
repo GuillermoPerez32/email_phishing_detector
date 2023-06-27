@@ -8,17 +8,54 @@ import {
   TableContainer,
 } from "@chakra-ui/react";
 import TableRow from "./TableRow";
-import { useGetEmailsQuery } from "../../services/email";
+import {
+  useGetEmailsQuery,
+  // useUploadEmailMutation,
+} from "../../services/email";
 
 const EmailsTable = () => {
   const table = {
-    header: ["No", "sender", "dest", "subject", "date created", "status"],
+    header: ["No", "sender", "dest", "subject", "date created", "phishing"],
   };
 
   const { data } = useGetEmailsQuery("df");
+  // const [uploadEmail, { isLoading, isError, isSuccess }] =
+  //   useUploadEmailMutation();
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const files = Array.from(event.dataTransfer.files);
+    // Aquí puedes realizar acciones con los archivos soltados
+    files.map(async (file) => {
+      // uploadEmail(file);
+
+      let headersList = {
+        Accept: "*/*",
+      };
+
+      let bodyContent = new FormData();
+      bodyContent.append("file", file);
+
+      fetch("http://127.0.0.1:8000/api/emails/", {
+        method: "POST",
+        body: bodyContent,
+        headers: headersList,
+      })
+        .then((response) => console.log(response.text()))
+        .catch((error) => console.error(error));
+
+      console.log(data);
+    });
+
+    console.log(files);
+  };
 
   return (
-    <TableContainer>
+    <TableContainer onDragOver={handleDragOver} onDrop={handleDrop}>
       <Table variant="simple">
         <Thead>
           <Tr>

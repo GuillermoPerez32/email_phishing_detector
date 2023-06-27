@@ -9,7 +9,8 @@ import uuid
 
 class Email(models.Model):
 
-    uuid = models.UUIDField(_("uuid"), primary_key=True, default=uuid.uuid4())
+    uuid = models.UUIDField(_("uuid"), primary_key=True,
+                            default=uuid.uuid4, unique=True)
     file = models.FileField(_("file"), upload_to='emails/',
                             validators=[FileExtensionValidator(['eml'])])
     date_created = models.DateTimeField(_("date created"), auto_now=True)

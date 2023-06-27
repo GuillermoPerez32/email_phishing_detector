@@ -14,12 +14,20 @@ export const emailApi = createApi({
     getEmailById: builder.query<Email, string>({
       query: (id) => `emails/${id}`,
     }),
-    addEmail: builder.mutation<Email, Partial<Email>>({
-      query(body) {
+    uploadEmail: builder.mutation({
+      query(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+
         return {
-          url: `emails`,
+          url: `emails/`,
           method: 'POST',
-          body,
+          body: formData,
+          headers: {
+            'Content-Type': `multipart/form-data`,
+            "Accept": "*/*",
+          },
         }
       },
     }),
@@ -28,4 +36,4 @@ export const emailApi = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetEmailsQuery } = emailApi
+export const { useGetEmailsQuery, useUploadEmailMutation } = emailApi

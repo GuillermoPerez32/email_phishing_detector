@@ -1,5 +1,4 @@
-import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
-import { Tr, Td, CircularProgress } from "@chakra-ui/react";
+import { Tr, Td } from "@chakra-ui/react";
 import { useDispatch } from "react-redux";
 import { setEmail } from "../../features/email/emailSlice";
 
@@ -46,15 +45,7 @@ const TableRow = ({
       <Td>{dest}</Td>
       <Td>{subject}</Td>
       <Td>{date_created.toString().split("T")[0]}</Td>
-      <Td>
-        {status === "success" ? (
-          <CheckIcon fontSize={15} color="green" />
-        ) : status === "idle" ? (
-          <CircularProgress isIndeterminate color="gray.300" size={10} />
-        ) : (
-          <CloseIcon fontSize={15} color="red" />
-        )}
-      </Td>
+      <Td>Yes</Td>
     </Tr>
   );
 };
