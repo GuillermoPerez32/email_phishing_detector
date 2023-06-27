@@ -1,1 +1,1 @@
-const backendHost = 'http://127.0.0.1:8000/api/';
+export const backendHost = 'http://127.0.0.1:8000/api/';
