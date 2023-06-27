@@ -12,6 +12,7 @@ import {
   useGetEmailsQuery,
   // useUploadEmailMutation,
 } from "../../services/email";
+import { uploadEmail } from "../../helpers/uploadEmail";
 
 const EmailsTable = () => {
   const table = {
@@ -33,22 +34,7 @@ const EmailsTable = () => {
     files.map(async (file) => {
       // uploadEmail(file);
 
-      let headersList = {
-        Accept: "*/*",
-      };
-
-      let bodyContent = new FormData();
-      bodyContent.append("file", file);
-
-      fetch("http://127.0.0.1:8000/api/emails/", {
-        method: "POST",
-        body: bodyContent,
-        headers: headersList,
-      })
-        .then((response) => console.log(response.text()))
-        .catch((error) => console.error(error));
-
-      console.log(data);
+      uploadEmail(file);
     });
 
     console.log(files);
@@ -72,7 +58,6 @@ const EmailsTable = () => {
               sender={"sender"}
               dest={"dest"}
               subject={"subject"}
-              status={"status"}
               date_created={date_created}
               uuid={uuid}
             />

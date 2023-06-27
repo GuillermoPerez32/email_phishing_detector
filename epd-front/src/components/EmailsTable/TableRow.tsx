@@ -7,7 +7,6 @@ interface TableRowProps {
   sender: string;
   dest: string;
   subject: string;
-  status: string;
   date_created: Date;
   uuid: string;
 }
@@ -17,7 +16,6 @@ const TableRow = ({
   sender,
   dest,
   subject,
-  status,
   date_created,
   uuid,
 }: TableRowProps) => {
