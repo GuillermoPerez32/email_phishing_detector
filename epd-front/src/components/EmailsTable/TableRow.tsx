@@ -1,6 +1,12 @@
-import { Tr, Td } from "@chakra-ui/react";
+import { Tr, Td, IconButton } from "@chakra-ui/react";
 import { useDispatch } from "react-redux";
 import { setEmail } from "../../features/email/emailSlice";
+import { DeleteIcon } from "@chakra-ui/icons";
+import {
+  emailApiEndpoints,
+  useDeleteEmailMutation,
+  useGetEmailsQuery,
+} from "../../services/email";
 
 interface TableRowProps {
   index: number;
@@ -20,9 +26,16 @@ const TableRow = ({
   uuid,
 }: TableRowProps) => {
   const dispatch = useDispatch();
+  const [deleteEmail] = useDeleteEmailMutation();
+  const { refetch } = dispatch(emailApiEndpoints.getEmails.initiate(""));
 
   const handleClick = () => {
     dispatch(setEmail(uuid));
+  };
+
+  const handleDelete = () => {
+    deleteEmail(uuid);
+    refetch();
   };
 
   return (
@@ -44,6 +57,14 @@ const TableRow = ({
       <Td>{subject}</Td>
       <Td>{date_created.toString().split("T")[0]}</Td>
       <Td>Yes</Td>
+      <Td>
+        <IconButton
+          colorScheme="red"
+          icon={<DeleteIcon />}
+          aria-label={"Delete Email Button"}
+          onClick={handleDelete}
+        />
+      </Td>
     </Tr>
   );
 };

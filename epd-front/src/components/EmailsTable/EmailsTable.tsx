@@ -16,7 +16,15 @@ import { uploadEmail } from "../../helpers/uploadEmail";
 
 const EmailsTable = () => {
   const table = {
-    header: ["No", "sender", "dest", "subject", "date created", "phishing"],
+    header: [
+      "No",
+      "sender",
+      "dest",
+      "subject",
+      "date created",
+      "phishing",
+      "Delete",
+    ],
   };
 
   const { data } = useGetEmailsQuery("df");

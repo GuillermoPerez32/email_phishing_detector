@@ -31,9 +31,17 @@ export const emailApi = createApi({
         }
       },
     }),
+    deleteEmail: builder.mutation({
+      query(id) {
+        return {
+          url: `emails/${id}`,
+          method: 'DELETE',
+        }
+      },
+    }),
   }),
 })
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetEmailsQuery, useGetEmailByIdQuery, useUploadEmailMutation } = emailApi
+export const { useGetEmailsQuery, useGetEmailByIdQuery, useUploadEmailMutation, useDeleteEmailMutation, endpoints:emailApiEndpoints } = emailApi
