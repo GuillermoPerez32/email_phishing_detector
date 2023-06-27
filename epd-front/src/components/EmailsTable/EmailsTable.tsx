@@ -15,7 +15,7 @@ const EmailsTable = () => {
     header: ["No", "sender", "dest", "subject", "date created", "status"],
   };
 
-  const { data, error, isLoading } = useGetEmailsQuery("df");
+  const { data } = useGetEmailsQuery("df");
 
   return (
     <TableContainer>
