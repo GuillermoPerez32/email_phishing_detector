@@ -36,4 +36,4 @@ export const emailApi = createApi({
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetEmailsQuery, useUploadEmailMutation } = emailApi
+export const { useGetEmailsQuery, useGetEmailByIdQuery, useUploadEmailMutation } = emailApi
