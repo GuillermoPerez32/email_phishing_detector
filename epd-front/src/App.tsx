@@ -1,7 +1,7 @@
 import { VStack } from "@chakra-ui/react";
-import Body from "./components/Body";
-import Footer from "./components/Footer";
-import NavBar from "./components/NavBar";
+import { Body } from "./components/Body";
+import { Footer } from "./components/Footer";
+import { NavBar } from "./components/NavBar";
 
 const App = () => {
   return (
@@ -20,4 +20,4 @@ const App = () => {
   );
 };
 
-export default App;
+export { App };
