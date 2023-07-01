@@ -10,9 +10,10 @@ import {
 import TableRow from "./TableRow";
 import {
   useGetEmailsQuery,
+  useUploadEmailMutation,
   // useUploadEmailMutation,
 } from "../../services/email";
-import { uploadEmail } from "../../helpers/uploadEmail";
+// import { uploadEmail } from "../../helpers/uploadEmail";
 
 const EmailsTable = () => {
   const table = {
@@ -28,8 +29,7 @@ const EmailsTable = () => {
   };
 
   const { data } = useGetEmailsQuery("df");
-  // const [uploadEmail, { isLoading, isError, isSuccess }] =
-  //   useUploadEmailMutation();
+  const [uploadEmail] = useUploadEmailMutation();
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -38,14 +38,10 @@ const EmailsTable = () => {
   const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const files = Array.from(event.dataTransfer.files);
-    // Aquí puedes realizar acciones con los archivos soltados
-    files.map(async (file) => {
-      // uploadEmail(file);
 
+    files.map(async (file) => {
       uploadEmail(file);
     });
-
-    console.log(files);
   };
 
   return (

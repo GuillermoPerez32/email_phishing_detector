@@ -11,6 +11,4 @@ export const uploadEmail = async (file:any) => {
         body: bodyContent,
         headers: headersList,
       })
-        .then((response) => console.log(response.text()))
-        .catch((error) => console.error(error));
 }
