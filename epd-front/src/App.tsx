@@ -1,15 +1,7 @@
 import { VStack } from "@chakra-ui/react";
-import { EmailPhishing } from "./pages/EmailPhishing";
+import { Outlet } from "react-router-dom";
 import { Footer } from "./components/Footer";
 import { NavBar } from "./components/NavBar";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <EmailPhishing />,
-  },
-]);
 
 const App = () => {
   return (
@@ -21,7 +13,7 @@ const App = () => {
         height="100vh"
       >
         <NavBar />
-        <RouterProvider router={router} />
+        <Outlet />
         <Footer />
       </VStack>
     </>

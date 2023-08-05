@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon, InfoIcon } from "@chakra-ui/icons";
 import logo from "../assets/logo.png";
+import { Link } from "react-router-dom";
 
 export function NavBar() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -17,10 +18,12 @@ export function NavBar() {
       <Box bg={useColorModeValue("green.100", "green.900")} px={4}>
         <Flex h={20} alignItems={"center"} justifyContent={"space-between"}>
           <Flex gap={4} alignItems={"center"}>
-            <img src={logo} alt="site logo" width={40} height={40} />
-            <Text fontSize={24} fontWeight={"bold"}>
-              Email Phishing Detector
-            </Text>
+            <Link to="emails">
+              <img src={logo} alt="site logo" width={40} height={40} />
+              <Text fontSize={24} fontWeight={"bold"}>
+                Email Phishing Detector
+              </Text>
+            </Link>
           </Flex>
 
           <Flex alignItems={"center"}>
