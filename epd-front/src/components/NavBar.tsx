@@ -21,7 +21,7 @@ export function NavBar() {
             <Flex gap={4} alignItems={"center"}>
               <img src={logo} alt="site logo" width={40} height={40} />
               <Text fontSize={24} fontWeight={"bold"}>
-                Email Phishing Detector
+                Phishing Detector
               </Text>
             </Flex>
           </Link>

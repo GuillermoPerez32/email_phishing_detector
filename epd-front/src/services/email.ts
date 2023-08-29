@@ -7,17 +7,26 @@ import { backendHost } from '../constants/constants'
 export const emailApi = createApi({
   reducerPath: 'emailApi',
   baseQuery: fetchBaseQuery({ baseUrl: backendHost }),
-  tagTypes: ['Emails'],
+  tagTypes: ['emails'],
   endpoints: (builder) => ({
     getEmails: builder.query<Array<Email>, string>({
       query: () => `emails`,
-      providesTags: ['Emails'],
+      providesTags: ['emails'],
     }),
     getEmailById: builder.query<Email, string>({
       query: (id) => `emails/${id}`,
     }),
+    deleteEmail: builder.mutation({
+      invalidatesTags: ['emails'],
+      query: (id) => {
+        return {
+          url: `emails/${id}`,
+          method: 'DELETE',
+        }
+      },
+    }),
     uploadEmail: builder.mutation({
-      invalidatesTags: ['Emails'],
+      invalidatesTags: ['emails'],
       query: (file) => {
         const formData = new FormData();
         formData.append('file', file);
@@ -26,18 +35,6 @@ export const emailApi = createApi({
           url: `emails/`,
           method: 'POST',
           body: formData,
-          headers: {
-            "Accept": "*/*",
-          },
-        }
-      },
-    }),
-    deleteEmail: builder.mutation({
-      invalidatesTags: ['Emails'],
-      query: (id) => {
-        return {
-          url: `emails/${id}`,
-          method: 'DELETE',
         }
       },
     }),
