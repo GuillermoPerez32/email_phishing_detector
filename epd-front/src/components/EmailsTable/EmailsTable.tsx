@@ -54,7 +54,7 @@ const EmailsTable = () => {
             ))}
           </Tr>
         </Thead>
-        <Tbody>
+        <Tbody height={100}>
           {data?.map(({ date_created, uuid }, i) => (
             <TableRow
               key={i}
