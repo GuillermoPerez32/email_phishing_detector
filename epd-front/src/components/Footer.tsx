@@ -7,7 +7,7 @@ export function Footer() {
       color={useColorModeValue("green.700", "green.200")}
     >
       <Text pt={6} fontSize={"sm"} textAlign={"center"}>
-        © 2023 Guillermo Perez, Jorge Sotolongo. All rights reserved.
+        © 2023 Guillermo Perez. All rights reserved.
       </Text>
     </Box>
   );
