@@ -1,4 +1,4 @@
-import { VStack } from "@chakra-ui/react";
+import { Box, VStack } from "@chakra-ui/react";
 import { Outlet } from "react-router-dom";
 import { Footer } from "./components/Footer";
 import { NavBar } from "./components/NavBar";
@@ -13,7 +13,9 @@ const App = () => {
         height="100vh"
       >
         <NavBar />
-        <Outlet />
+        <Box height="100%">
+          <Outlet />
+        </Box>
         <Footer />
       </VStack>
     </>
