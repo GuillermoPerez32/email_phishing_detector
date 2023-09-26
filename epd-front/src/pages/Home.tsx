@@ -10,12 +10,16 @@ export const Home = () => {
       gap={12}
       height="100%"
     >
-      <Button>
-        <Link to="emails">Emails</Link>
-      </Button>
-      <Button>
-        <Link to="metrics">Metrics</Link>
-      </Button>
+      <Link to="emails">
+        <Button paddingX={16} paddingY={8}>
+          Emails
+        </Button>
+      </Link>
+      <Link to="metrics">
+        <Button paddingX={16} paddingY={8}>
+          Metrics
+        </Button>
+      </Link>
     </Flex>
   );
 };
