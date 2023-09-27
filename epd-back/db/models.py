@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.core.validators import FileExtensionValidator
 from django.utils.translation import gettext_lazy as _
+from .utils.email import get_features
 import uuid
 
 # Create your models here.
@@ -24,3 +25,8 @@ class Email(models.Model):
 
     def get_absolute_url(self):
         return reverse("email_detail", kwargs={"pk": self.pk})
+
+    @property
+    def features(self):
+        features = get_features(self.file.path)
+        return features
