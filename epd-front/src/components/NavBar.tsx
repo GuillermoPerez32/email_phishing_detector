@@ -1,7 +1,5 @@
+import { Card } from "./Card";
+
 export const NavBar = () => {
-  return (
-    <>
-      <h1>navbar</h1>
-    </>
-  );
+  return <Card boxProps={{ width: "100%" }}>Navbar</Card>;
 };

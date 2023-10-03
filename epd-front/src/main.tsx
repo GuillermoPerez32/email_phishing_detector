@@ -6,7 +6,7 @@ import { store } from "./app/store.ts";
 
 import { AppRouter } from "./router/AppRouter.tsx";
 import { ThemeProvider } from "@mui/material";
-import { lightTheme } from "./theme/light.ts";
+import { lightTheme } from "./theme";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
