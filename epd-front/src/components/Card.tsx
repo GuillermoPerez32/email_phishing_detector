@@ -11,6 +11,7 @@ export const Card = ({ children, boxProps }: Props) => {
   return (
     <Box
       borderRadius="16px"
+      padding="16px"
       sx={{
         backgroundColor: theme.palette.common.white,
       }}

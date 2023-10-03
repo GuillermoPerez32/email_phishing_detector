@@ -1,6 +1,5 @@
 import { Box, Grid, useTheme } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import { Footer } from "./components/Footer";
 import { NavBar } from "./components/NavBar";
 import { SideBar } from "./components/SideBar";
 
@@ -17,18 +16,17 @@ const App = () => {
       <Grid
         container
         direction="row"
-        spacing={8}
+        spacing={4}
         sx={{
           backgroundColor: theme.palette.background.default,
         }}
       >
-        <Grid item sm={3}>
+        <Grid item sm={2}>
           <SideBar />
         </Grid>
-        <Grid item width="10%">
+        <Grid item sm={10} width="10%">
           <NavBar />
           <Outlet />
-          <Footer />
         </Grid>
       </Grid>
     </Box>
