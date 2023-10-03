@@ -9,7 +9,7 @@ export const Card = ({ children, ...others }: Props) => {
   const theme = useTheme();
   return (
     <Box
-      borderRadius="12px"
+      borderRadius={3}
       sx={{
         backgroundColor: theme.palette.common.white,
       }}
