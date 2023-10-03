@@ -12,6 +12,6 @@ export const lightTheme = createTheme({
     background: {
       default: "#EEF0F4",
     },
-    },
-    
+  },
+  spacing: 4
 });

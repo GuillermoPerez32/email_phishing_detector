@@ -1,21 +1,19 @@
 import { Box, BoxProps, useTheme } from "@mui/material";
 import React from "react";
 
-type Props = {
+type Props = BoxProps & {
   children: React.ReactElement | string | Array<React.ReactElement>;
-  boxProps: BoxProps;
 };
 
-export const Card = ({ children, boxProps }: Props) => {
+export const Card = ({ children, ...others }: Props) => {
   const theme = useTheme();
   return (
     <Box
-      borderRadius="16px"
-      padding="16px"
+      borderRadius="12px"
       sx={{
         backgroundColor: theme.palette.common.white,
       }}
-      {...boxProps}
+      {...others}
     >
       {children}
     </Box>

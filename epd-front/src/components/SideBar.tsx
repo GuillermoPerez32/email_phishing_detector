@@ -1,22 +1,27 @@
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { Card } from "./Card";
 import { Link } from "react-router-dom";
-import { Dashboard } from "@mui/icons-material";
+import { Dashboard, Email, QueryStats } from "@mui/icons-material";
 
 export const SideBar = () => {
   return (
     <Card
-      boxProps={{
-        height: "90vh",
-      }}
+      height="90vh"
+      paddingY={5}
+      paddingX={4}
+      display="flex"
+      flexDirection="column"
     >
+      <Box mb={5} display="flex" justifyContent="center">
+        <img src="logo.png" alt="" width="30%" />
+      </Box>
       <SideBarItem to="/" startIcon={<Dashboard />}>
         Dashboard
       </SideBarItem>
-      <SideBarItem to="emails" startIcon={<Dashboard />}>
+      <SideBarItem to="emails" startIcon={<Email />}>
         Emails
       </SideBarItem>
-      <SideBarItem to="metrics" startIcon={<Dashboard />}>
+      <SideBarItem to="metrics" startIcon={<QueryStats />}>
         Metrics
       </SideBarItem>
     </Card>
