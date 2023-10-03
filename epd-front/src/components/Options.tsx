@@ -1,8 +1,9 @@
 // TODO
-import { AddIcon } from "@chakra-ui/icons";
-import { IconButton, chakra } from "@chakra-ui/react";
+// import { AddIcon } from "@chakra-ui/icons";
+import { IconButton, Box } from "@mui/material";
 import { useRef } from "react";
 import { uploadEmail } from "../helpers/uploadEmail";
+import { Add } from "@mui/icons-material";
 
 const Options = () => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -22,7 +23,7 @@ const Options = () => {
 
   return (
     <label htmlFor="file-upload">
-      <chakra.div display="inline-block">
+      <Box display="inline-block">
         <input
           type="file"
           accept=".eml"
@@ -31,14 +32,16 @@ const Options = () => {
           id="file-upload"
           ref={inputRef}
         />
-        <IconButton
-          type="button"
-          aria-label={"Add Email"}
-          icon={<AddIcon />}
-          onClick={handleButtonClick}
-          w="10%"
-        ></IconButton>
-      </chakra.div>
+        <Box width="10%">
+          <IconButton
+            type="button"
+            aria-label={"Add Email"}
+            onClick={handleButtonClick}
+          >
+            <Add />
+          </IconButton>
+        </Box>
+      </Box>
     </label>
   );
 };

@@ -1,4 +1,4 @@
-import { CircularProgress } from "@chakra-ui/react";
+import { CircularProgress } from "@mui/material";
 import { useAppSelector } from "../app/hooks";
 import { useEffect } from "react";
 import { useGetEmailByIdQuery } from "../services/email";
@@ -18,7 +18,7 @@ const DetailsContainer = () => {
   return (
     <div>
       {isLoading ? (
-        <CircularProgress isIndeterminate />
+        <CircularProgress />
       ) : (
         <div>
           {Object.keys(features).map((e) => (

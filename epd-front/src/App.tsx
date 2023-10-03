@@ -1,23 +1,23 @@
-import { Box, VStack } from "@chakra-ui/react";
+import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { Footer } from "./components/Footer";
 import { NavBar } from "./components/NavBar";
+import { SideBar } from "./components/SideBar";
 
 const App = () => {
   return (
     <>
-      <VStack
+      <Box
         justifyContent={"space-between"}
-        direction={"column"}
-        align="stretch"
+        flexDirection={"column"}
+        alignItems="stretch"
         height="100vh"
       >
+        <SideBar />
         <NavBar />
-        <Box height="100%">
-          <Outlet />
-        </Box>
+        <Outlet />
         <Footer />
-      </VStack>
+      </Box>
     </>
   );
 };
