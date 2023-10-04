@@ -1,6 +1,6 @@
 import { Box, Grid, useTheme } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import { NavBar } from "./components/NavBar";
+import { NavBar } from "./components/NavBar/NavBar";
 import { SideBar } from "./components/SideBar";
 
 const App = () => {
