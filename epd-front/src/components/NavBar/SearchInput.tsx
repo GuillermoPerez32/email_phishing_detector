@@ -12,7 +12,8 @@ export const SearchInput = () => {
         p: "2px 4px",
         display: "flex",
         alignItems: "center",
-        width: 200,
+        width: 260,
+        height: 40,
         backgroundColor: "#F2F6FA",
         border: "0",
       }}

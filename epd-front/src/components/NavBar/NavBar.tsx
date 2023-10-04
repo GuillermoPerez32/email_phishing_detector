@@ -20,7 +20,9 @@ export const NavBar = () => {
           justifyContent="end"
           alignItems="center"
         >
-          <Avatar sx={{ bgcolor: deepOrange[500] }}>GP</Avatar>
+          <Avatar sx={{ bgcolor: deepOrange[500] }} sizes="40px">
+            GP
+          </Avatar>
         </Grid>
       </Grid>
     </Card>
