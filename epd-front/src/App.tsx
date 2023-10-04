@@ -2,6 +2,7 @@ import { Box, Grid, useTheme } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { NavBar } from "./components/NavBar/NavBar";
 import { SideBar } from "./components/SideBar";
+import { PageInfo } from "./components/PageInfo";
 
 const App = () => {
   const theme = useTheme();
@@ -26,6 +27,7 @@ const App = () => {
         </Grid>
         <Grid item sm={10} width="10%">
           <NavBar />
+          <PageInfo />
           <Outlet />
         </Grid>
       </Grid>
