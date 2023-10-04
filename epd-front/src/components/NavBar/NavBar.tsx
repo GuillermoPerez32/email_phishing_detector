@@ -6,7 +6,7 @@ import { SearchInput } from "./SearchInput";
 
 export const NavBar = () => {
   return (
-    <Card width="auto" paddingX={6} paddingY={5}>
+    <Card width="auto" paddingX={6} paddingY={5} marginBottom={8}>
       <Grid container>
         <Grid item sm={8} display="flex" alignItems="center">
           <FilterButton />
