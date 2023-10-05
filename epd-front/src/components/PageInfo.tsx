@@ -8,7 +8,7 @@ export const PageInfo = () => {
   const displayName = name.charAt(0).toUpperCase() + name.slice(1);
 
   return (
-    <Box my={8} ml={2}>
+    <Box my={5} ml={2}>
       <Typography variant="h5">
         {name.length > 0 ? displayName : "Dashboard"}
       </Typography>

@@ -6,7 +6,7 @@ const EmailPhishing = () => {
   // const emailId = useAppSelector((state) => state.emails.emailId);
 
   return (
-    <Card width="100%" height="90%" padding="24px">
+    <Card width="100%" height="70%" padding="24px">
       <Typography>Emails</Typography>
     </Card>
   );
