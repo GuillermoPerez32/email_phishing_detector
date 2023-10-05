@@ -19,6 +19,7 @@ const EmailsTable = () => {
   };
 
   const { data } = useGetEmailsQuery("df");
+
   const [uploadEmail] = useUploadEmailMutation();
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
