@@ -41,7 +41,7 @@ def load_mail(path):
         str_content = byte_content.decode('utf-8', errors='ignore')
         return str_content
 
-def getMailBody(mail):
+def get_mail_body(mail):
     try:
         parsed_mail = mailparser.parse_from_string(mail)
         mail_body = parsed_mail.body.lower()
@@ -91,7 +91,7 @@ def cleanpunc(sentence): #function to clean the word of any punctuation or speci
 
 
 
-def cleanBody(mail_body):
+def clean_body(mail_body):
         filtered = []
         filtered_text = cleanpunc(cleanhtml(mail_body))
         word_tokens = word_tokenize(filtered_text)
@@ -100,27 +100,27 @@ def cleanBody(mail_body):
                     filtered.append(w)
         return filtered
 
-def presenceHTML(mail):
+def presence_html(mail):
     msg = email.message_from_string(mail)
     return int((msg.get_content_type() == 'text/html') == True)
   
 
-def presenceHTMLFORM(message):
+def presence_htmlform(message):
     return int((re.compile(r'<\s?\/?\s?form\s?>', re.IGNORECASE).search(message)
              != None) == True)
 
 
-def presenceHTMLIFRAME(message):
+def presence_htmliframe(message):
     return int(re.compile(r'<\s?\/?\s?iframe\s?>',
                       re.IGNORECASE).search(message) != None) == True
 
 
-def presenceJavaScript(message):
+def presence_java_script(message):
     return int(re.compile(r'<\s?\/?\s?script\s?>',
                       re.IGNORECASE).search(message) != None) == True
 
 
-def presenceFlashContent(message):
+def presence_flash_content(message):
     swflinks = re.compile(
         r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F])+).*\.swf",
         re.IGNORECASE).findall(message)
@@ -129,11 +129,11 @@ def presenceFlashContent(message):
     return int((swflinks != None and len(swflinks) > 0) or (flashObject != None)) == True
 
 
-def presenceGeneralSalutation(message):
+def presence_general_salutation(message):
     return int(re.compile(GENERAL_SALUTATION,re.IGNORECASE).search(message) != None) == True
 
 
-def numberOfAttachments(raw_mail):
+def number_of_attachments(raw_mail):
     try:
         mail = mailparser.parse_from_string(raw_mail)
         count = len(mail.attachments)
@@ -151,7 +151,7 @@ def popups(mail_body):
     return 0
        
 def body_richness(mail_body):
-    mail_body = cleanBody(mail_body)
+    mail_body = clean_body(mail_body)
     if len(set(mail_body))!=0:
         return (len(mail_body)/len(set(mail_body)))
     else:
@@ -160,11 +160,11 @@ def body_richness(mail_body):
 
  #########################################URL features #########################################
 
-def isURL(link):
+def is_url(link):
     return re.compile(URLREGEX, re.IGNORECASE).search(link) is not None
 
 
-def getURLs(mail_body):
+def get_ur_ls(mail_body):
     result = []
     cleanPayload = re.sub(r'\s+', ' ', mail_body)
     soup = BeautifulSoup(cleanPayload, 'html.parser')
@@ -176,7 +176,7 @@ def getURLs(mail_body):
 
     for link in links:
         if isinstance(link, str) or isinstance(link, bytes):
-            if isURL(link):
+            if is_url(link):
                 result.append(link)
         else:
             continue
@@ -193,7 +193,7 @@ def getURLs(mail_body):
     return result
 
 
-def IPasURL(urls):
+def ip_as_url(urls):
     result = []
     count = 0
     for url in urls:
@@ -203,7 +203,7 @@ def IPasURL(urls):
     return count
 
 
-def textLinkDisparity(mail_body):
+def text_link_disparity(mail_body):
     count = 0
     soup = BeautifulSoup(mail_body, 'html.parser')
     lists = soup.find_all('a')
@@ -213,12 +213,12 @@ def textLinkDisparity(mail_body):
             text = str(string)
             text = text.strip().replace('\n', '')
             text = text.strip().replace('\t', ' ')
-            if isURL(text) and text != link:
+            if is_url(text) and text != link:
                 count += 1
     return count
 
 
-def maliciousURL(urls):
+def malicious_url(urls):
     count = 0
     for url in urls:
         if ((re.compile(IPREGEX, re.IGNORECASE).search(url)
@@ -229,7 +229,7 @@ def maliciousURL(urls):
     return count
 
 
-def hexadecimalURL(urls):
+def hexadecimal_url(urls):
     count = 0
     for url in urls:
         if ((re.compile(r'%[0-9a-fA-F]+', re.IGNORECASE).search(url)
@@ -238,7 +238,7 @@ def hexadecimalURL(urls):
     return count
 
 
-def getAlexaRank(domain):
+def get_alexa_rank(domain):
     if domain in alexa_rank_cache:
 #         cache_hit +=1
         return int(alexa_rank_cache[domain])
@@ -259,7 +259,7 @@ def getAlexaRank(domain):
     return int(rank)
 
 
-def extractDomains(urls):
+def extract_domains(urls):
     domain_set = set()
     for url in urls:
         domain = tldextract.extract(url).registered_domain
@@ -271,7 +271,7 @@ def extractDomains(urls):
     return list(domain_set)
 
 
-def domainCounts(url):
+def domain_counts(url):
     domains = tldextract.extract(url)
     count = (len(re.compile(r'\.',re.IGNORECASE).findall( domains.subdomain))) + \
         ((len(re.compile(r'\.',re.IGNORECASE).findall( domains.domain)))+1)
@@ -280,11 +280,11 @@ def domainCounts(url):
     return (count)
 
 
-def presenceBadRankedURL(urls):
-    domains = extractDomains(urls)
+def presence_bad_ranked_url(urls):
+    domains = extract_domains(urls)
     max_rank = 0
     for domain in domains:
-        rank = getAlexaRank(domain)
+        rank = get_alexa_rank(domain)
         max_rank = max(rank, max_rank)
         if rank == -1:
             return 0
@@ -292,10 +292,10 @@ def presenceBadRankedURL(urls):
         return 1
     return 0
 
-def maxDomainsCounts(urls):
+def max_domains_counts(urls):
     count = 1
     for url in urls:
-        count = max(domainCounts(url), count)
+        count = max(domain_counts(url), count)
     return count
 
 def at_in_url(urls):
@@ -306,13 +306,13 @@ def at_in_url(urls):
             continue
     return 0
 
-def writeCache():
+def write_cache():
     with open('./cache/alexa_rank_cache.txt', 'w') as cache_file:
         cache_file.write(json.dumps(alexa_rank_cache))
         print("Cache written")
         
 
-def loadCache():
+def load_cache():
     try:
         with open('./cache/alexa_rank_cache.txt','r') as cache_file:
             cache = ast.literal_eval(cache_file.read())
@@ -322,10 +322,10 @@ def loadCache():
         print("No alexa rank cache found")
 
 ############################# Subject line features #############################
-def isRepliedMail(subject):
+def is_replied_mail(subject):
     return (subject).startswith('Re:')
 
-def isForwardedMail(subject):
+def is_forwarded_mail(subject):
     return (subject).startswith('Fwd:')
 
 def subject_richness(subject):
@@ -435,26 +435,26 @@ def number_of_dash(headers):
 def get_features(path):
     mail = load_mail(path)
     
-    parsed_mail = getMailBody(mail)
+    parsed_mail = get_mail_body(mail)
     
     mail_body = parsed_mail[0]
     mail_subject = parsed_mail[1]
     mail_headers = parsed_mail[2]
     
-    urls = getURLs(mail_body)
+    urls = get_ur_ls(mail_body)
     feature = {}
     
-    feature['has_html']= int(presenceHTML(mail)==True)
+    feature['has_html']= int(presence_html(mail)==True)
     
-    feature['has_html_form']= int(presenceHTMLFORM(mail_body)==True)
+    feature['has_html_form']= int(presence_htmlform(mail_body)==True)
     
-    feature['has_html_frame']= int(presenceHTMLIFRAME(mail_body)==True)
+    feature['has_html_frame']= int(presence_htmliframe(mail_body)==True)
     
-    feature['presence_flash_content']= int(presenceFlashContent(mail_body)==True)
+    feature['presence_flash_content']= int(presence_flash_content(mail_body)==True)
     
-    feature['presence_general_salutation']= int(presenceGeneralSalutation(mail_body)==True)
+    feature['presence_general_salutation']= int(presence_general_salutation(mail_body)==True)
     
-    feature['presence_java_script']= int(presenceJavaScript(mail_body)==True)
+    feature['presence_java_script']= int(presence_java_script(mail_body)==True)
     
     feature['mail_to']= int(mail_to(mail_body)==True)
     
@@ -464,27 +464,27 @@ def get_features(path):
     
     feature['len']= len(urls)
     
-    feature['malicious_url']= (maliciousURL(urls))
+    feature['malicious_url']= (malicious_url(urls))
     
-    feature['text_link_disparity']= textLinkDisparity(mail_body)
+    feature['text_link_disparity']= text_link_disparity(mail_body)
     
-    feature['number_of_attachments'] = numberOfAttachments(mail)
+    feature['number_of_attachments'] = number_of_attachments(mail)
     
-    feature['i_pas_url'] = (IPasURL(urls))
+    feature['ip_as_url'] = (ip_as_url(urls))
     
-    feature['hexadecimal_url'] = (hexadecimalURL(urls))
+    feature['hexadecimal_url'] = (hexadecimal_url(urls))
     
-    feature['presence_bad_ranked_url'] = int(presenceBadRankedURL(urls)==True)
+    feature['presence_bad_ranked_url'] = int(presence_bad_ranked_url(urls)==True)
     
-    feature['max_domains_counts'] = (maxDomainsCounts(urls))
+    feature['max_domains_counts'] = (max_domains_counts(urls))
     
     feature['at_in_url']= at_in_url(urls)
     
     feature['subject_richness'] = subject_richness(mail_subject)
     
-    feature['is_forwarded_mail']= int(isForwardedMail(mail_subject)==True)
+    feature['is_forwarded_mail']= int(is_forwarded_mail(mail_subject)==True)
     
-    feature['is_replied_mail']= int(isRepliedMail(mail_subject)==True)
+    feature['is_replied_mail']= int(is_replied_mail(mail_subject)==True)
     
     feature['contains_account']= int(contains_account(mail_subject)== True)
     
