@@ -15,6 +15,7 @@ class Email(models.Model):
     file = models.FileField(_("file"), upload_to='emails/',
                             validators=[FileExtensionValidator(['eml'])])
     date_created = models.DateTimeField(_("date created"), auto_now=True)
+    phishing = models.BooleanField(_("phishing"))
 
     class Meta:
         verbose_name = _("email")

@@ -1,4 +1,4 @@
-import ast, email, json, re, nltk, mailparser, urllib, tldextract, textdistance
+import ast, email, json, re, nltk, mailparser, urllib, tldextract, textdistance, random
 from collections import OrderedDict
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
@@ -520,3 +520,6 @@ def get_mail_data(path):
     features['mail_headers'] = parsed_mail[2]
 
     return features
+
+def predict():
+    return random.choice([True, False])
