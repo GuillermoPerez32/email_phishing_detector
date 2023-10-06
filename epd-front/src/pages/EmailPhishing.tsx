@@ -1,7 +1,7 @@
 // import { useAppSelector } from "../app/hooks";
 import { Typography } from "@mui/material";
 import { Card } from "../components/Card";
-import EmailsTable from "../components/EmailsTable/EmailsTable";
+import EmailsTable from "../components/EmailsTable/EmailsTable.1";
 
 const EmailPhishing = () => {
   // const emailId = useAppSelector((state) => state.emails.emailId);
