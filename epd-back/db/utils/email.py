@@ -1,38 +1,509 @@
-import datetime
-import json
-import eml_parser
+import ast, email, json, re, nltk, mailparser, urllib, tldextract, textdistance
+from collections import OrderedDict
+from bs4 import BeautifulSoup
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem.snowball import SnowballStemmer
+from nltk.stem.wordnet import WordNetLemmatizer
+
+URLREGEX = r"^(https?|ftp)://[^\s/$.?#].[^\s]*$"
+URLREGEX_NOT_ALONE = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+FLASH_LINKED_CONTENT = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F])+).*\.swf"
+HREFREGEX = '<a\s*href=[\'|"](.*?)[\'"].*?\s*>'
+IPREGEX = r"\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))\b"
+MALICIOUS_IP_URL = r"\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\/(www|http|https|ftp))\b"
+EMAILREGEX = r"([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)"
+GENERAL_SALUTATION = r'\b(dear|hello|Good|Greetings)(?:\W+\w+){0,6}?\W+(user|customer|seller|buyer|account holder)\b'
+
+alexa_rank_cache = {}
+
+nltk.download('stopwords')
+nltk.download('punkt')
+  
+stop_words = set(stopwords.words('english')) #set of stopwords
+stemmer = SnowballStemmer('english')
+lemmatizer = WordNetLemmatizer()
+
+FIELDS = [
+    "HTML", "HTMLForm", "IFrame", "FlashContent", "General Salutation",
+    "Javascript", "mailto:", "popups", "body richness", "Number of URLs", "Malicious URL", "text link disparity",
+    "Attachments", "IP URLs", "hexadecimal URL", "Bad Rank Domain",
+    "Maximum Domains Counts", "@_in_url", "Subject richness", "Fwd: mail", "Re: mail", "contains account", "contains verify",
+    "contains update", "contains prime targets", "contains suspension", "contains password", "contains urgent", "contains access",
+    "number of dots", "number of dash"
+]
+
+def load_mail(path):
+    """load emails from the specified directory"""
+
+    with open(path, 'rb') as f:
+        byte_content = f.read()
+        str_content = byte_content.decode('utf-8', errors='ignore')
+        return str_content
+
+def getMailBody(mail):
+    try:
+        parsed_mail = mailparser.parse_from_string(mail)
+        mail_body = parsed_mail.body.lower()
+        subject = parsed_mail.subject
+        headers = parsed_mail.headers
+
+    except UnicodeDecodeError as Argument:
+        parsed_mail = email.message_from_string(mail)
+        body = ""
+        if parsed_mail.is_multipart():
+            for part in parsed_mail.walk():
+                # returns a bytes object
+                payload = part.get_payload(decode=True)
+                strtext = payload.decode()
+                body += strtext
+        else:
+            payload = parsed_mail.get_payload(decode=True)
+            strtext = payload.decode()
+            body += strtext
+        headers = email.parser.HeaderParser().parsestr(mail)
+        mail_body = body.lower()
+        subject = headers['Subject']
+    return [mail_body, subject, headers]
+
+def cleanhtml(sentence): #function to clean the word of any html-tags
+    cleanr = re.compile('<.*?>')
+    cleantext = re.sub(cleanr, ' ', sentence)
+    return cleantext
+
+def cleanpunc(sentence): #function to clean the word of any punctuation or special characters
+    cleaned = re.sub(r'[?|!|\'|"|#]',r'',sentence)
+    cleaned = re.sub(r'[.|,|)|(|\|/]',r'',cleaned)
+    return  cleaned
+
+######################################### Mail features extraction #########################################
 
 
-def json_serial(obj):
-    if isinstance(obj, datetime.datetime):
-        serial = obj.isoformat()
-        return serial
+def cleanhtml(sentence): #function to clean the word of any html-tags
+    cleanr = re.compile('<.*?>')
+    cleantext = re.sub(cleanr, ' ', sentence)
+    return cleantext
+
+def cleanpunc(sentence): #function to clean the word of any punctuation or special characters
+    cleaned = re.sub(r'[?|!|\'|"|#]',r'',sentence)
+    cleaned = re.sub(r'[.|,|)|(|\|/]',r' ',cleaned)
+    return  cleaned
 
 
-def get_eml(file_path):
-    with open(file_path, 'rb') as fhdl:
-        raw_email = fhdl.read()
 
-        ep = eml_parser.EmlParser()
-        parsed_eml = ep.decode_email_bytes(raw_email)
-        return parsed_eml
+def cleanBody(mail_body):
+        filtered = []
+        filtered_text = cleanpunc(cleanhtml(mail_body))
+        word_tokens = word_tokenize(filtered_text)
+        for w in word_tokens:
+                if w not in stop_words and w.isalpha():
+                    filtered.append(w)
+        return filtered
+
+def presenceHTML(mail):
+    msg = email.message_from_string(mail)
+    return int((msg.get_content_type() == 'text/html') == True)
+  
+
+def presenceHTMLFORM(message):
+    return int((re.compile(r'<\s?\/?\s?form\s?>', re.IGNORECASE).search(message)
+             != None) == True)
 
 
-def get_features(file_path) -> dict:
-    # TODO: Complete extraction
-    features = {}
-    file_path = file_path
-    parsed_eml = get_eml(file_path)
+def presenceHTMLIFRAME(message):
+    return int(re.compile(r'<\s?\/?\s?iframe\s?>',
+                      re.IGNORECASE).search(message) != None) == True
 
-# ---------------------->EXTRACTION OF FEATURES<-----------------------------
-    header = parsed_eml['header']
-    body = parsed_eml['body']
 
-    subject = header['subject']
-    email_from = header['from']
+def presenceJavaScript(message):
+    return int(re.compile(r'<\s?\/?\s?script\s?>',
+                      re.IGNORECASE).search(message) != None) == True
 
-    features['subject'] = subject
-    features['from'] = email_from
 
-# ---------------------->END EXTRACTIONS<-----------------------------
-    return features
+def presenceFlashContent(message):
+    swflinks = re.compile(
+        r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F])+).*\.swf",
+        re.IGNORECASE).findall(message)
+    flashObject = re.compile(r'embed\s*src\s*=\s*\".*\.swf\"',
+                             re.IGNORECASE).search(message)
+    return int((swflinks != None and len(swflinks) > 0) or (flashObject != None)) == True
+
+
+def presenceGeneralSalutation(message):
+    return int(re.compile(GENERAL_SALUTATION,re.IGNORECASE).search(message) != None) == True
+
+
+def numberOfAttachments(raw_mail):
+    try:
+        mail = mailparser.parse_from_string(raw_mail)
+        count = len(mail.attachments)
+        return count
+    except:
+        return 0
+
+def mail_to(mail_body):
+    return int(re.compile(r'mailto:',
+                      re.IGNORECASE).search(mail_body) != None) == True
+
+def popups(mail_body):
+    if re.compile(r'window.open|onclick',re.IGNORECASE).search(mail_body):
+         return 1
+    return 0
+       
+def body_richness(mail_body):
+    mail_body = cleanBody(mail_body)
+    if len(set(mail_body))!=0:
+        return (len(mail_body)/len(set(mail_body)))
+    else:
+        return len(mail_body)
+    
+
+ #########################################URL features #########################################
+
+def isURL(link):
+    return re.compile(URLREGEX, re.IGNORECASE).search(link) is not None
+
+
+def getURLs(mail_body):
+    result = []
+    cleanPayload = re.sub(r'\s+', ' ', mail_body)
+    soup = BeautifulSoup(cleanPayload, 'html.parser')
+    links = soup.find_all('a')
+    i = 0
+    for link in links:
+        links[i] = link.get('href')
+        i += 1
+
+    for link in links:
+        if isinstance(link, str) or isinstance(link, bytes):
+            if isURL(link):
+                result.append(link)
+        else:
+            continue
+
+    urlregex = re.compile(URLREGEX_NOT_ALONE, re.IGNORECASE)
+    links = urlregex.findall(cleanPayload)
+
+    for link in links:
+        if link not in result:
+            result.append(link)
+
+    res = list(OrderedDict.fromkeys(result))
+    result = list(set(result))
+    return result
+
+
+def IPasURL(urls):
+    result = []
+    count = 0
+    for url in urls:
+        if re.compile(IPREGEX, re.IGNORECASE).search(url) and re.compile(IPREGEX, re.IGNORECASE).search(url).group(1) is not None:
+            result.append(re.compile(IPREGEX, re.IGNORECASE).search(url).group(1))
+            count += 1
+    return count
+
+
+def textLinkDisparity(mail_body):
+    count = 0
+    soup = BeautifulSoup(mail_body, 'html.parser')
+    lists = soup.find_all('a')
+    for item in lists:
+        link = item.get('href')
+        for string in item.stripped_strings:
+            text = str(string)
+            text = text.strip().replace('\n', '')
+            text = text.strip().replace('\t', ' ')
+            if isURL(text) and text != link:
+                count += 1
+    return count
+
+
+def maliciousURL(urls):
+    count = 0
+    for url in urls:
+        if ((re.compile(IPREGEX, re.IGNORECASE).search(url)
+             is not None) == True or (len(re.compile(r'(https?://)',re.IGNORECASE).findall(url)) > 1)
+                or (len(re.compile(r'(www.)',re.IGNORECASE).findall(url)) > 1)
+                or (len(re.compile(r'(\.com|\.org|\.co)',re.IGNORECASE).findall(url)) > 1))== True:
+            count += 1
+    return count
+
+
+def hexadecimalURL(urls):
+    count = 0
+    for url in urls:
+        if ((re.compile(r'%[0-9a-fA-F]+', re.IGNORECASE).search(url)
+             is not None) == True):
+            count += 1
+    return count
+
+
+def getAlexaRank(domain):
+    if domain in alexa_rank_cache:
+#         cache_hit +=1
+        return int(alexa_rank_cache[domain])
+#     else:
+#         cache_miss += 1
+    try:
+        xml = urllib.request.urlopen(
+            'http://data.alexa.com/data?cli=10&dat=s&url=%s' %
+            domain).read().decode('utf-8')
+    except:
+        alexa_rank_cache[domain] = 0
+        return 0
+    try:
+        rank = (re.compile(r'RANK="(\d+)"',re.IGNORECASE).findall(xml))[1]
+    except:
+        rank = -1
+    alexa_rank_cache[domain] = rank
+    return int(rank)
+
+
+def extractDomains(urls):
+    domain_set = set()
+    for url in urls:
+        domain = tldextract.extract(url).registered_domain
+        if domain not in domain_set:
+            domain_set.add(domain)
+        else:
+            continue
+
+    return list(domain_set)
+
+
+def domainCounts(url):
+    domains = tldextract.extract(url)
+    count = (len(re.compile(r'\.',re.IGNORECASE).findall( domains.subdomain))) + \
+        ((len(re.compile(r'\.',re.IGNORECASE).findall( domains.domain)))+1)
+    if re.compile(IPREGEX,re.IGNORECASE).search(domains.domain) is not None:
+        count -= 3
+    return (count)
+
+
+def presenceBadRankedURL(urls):
+    domains = extractDomains(urls)
+    max_rank = 0
+    for domain in domains:
+        rank = getAlexaRank(domain)
+        max_rank = max(rank, max_rank)
+        if rank == -1:
+            return 0
+    if max_rank > 70000:
+        return 1
+    return 0
+
+def maxDomainsCounts(urls):
+    count = 1
+    for url in urls:
+        count = max(domainCounts(url), count)
+    return count
+
+def at_in_url(urls):
+    for url in urls:
+        if (re.compile(r'@',re.IGNORECASE).search(url)):
+            return 1
+        else: 
+            continue
+    return 0
+
+def writeCache():
+    with open('./cache/alexa_rank_cache.txt', 'w') as cache_file:
+        cache_file.write(json.dumps(alexa_rank_cache))
+        print("Cache written")
+        
+
+def loadCache():
+    try:
+        with open('./cache/alexa_rank_cache.txt','r') as cache_file:
+            cache = ast.literal_eval(cache_file.read())
+            alexa_rank_cache = cache
+            print("Cache loaded")
+    except FileNotFoundError:
+        print("No alexa rank cache found")
+
+############################# Subject line features #############################
+def isRepliedMail(subject):
+    return (subject).startswith('Re:')
+
+def isForwardedMail(subject):
+    return (subject).startswith('Fwd:')
+
+def subject_richness(subject):
+    texts = subject.split()
+    if len(set(texts))!=0:
+        return (len(texts)/len(set(texts)))
+    else:
+        return len(texts)
+def contains_verify(subject):
+     subject = purify(subject)
+     jaro = textdistance.Jaro()
+     for w in subject.split():
+         
+         if (jaro('verify',w)) >0.9:
+            return 1
+     return 0
+
+def contains_update(subject):
+     subject = purify(subject)
+     jaro = textdistance.Jaro()
+     for w in subject.split():
+         
+         if (jaro('update',w)) >0.9:
+            return 1
+     return 0
+
+def contains_access(subject):
+     subject = purify(subject)
+     jaro = textdistance.Jaro()
+     for w in subject.split():
+         
+         if (jaro('access',w)) >0.9:
+            return 1
+     return 0
+
+def contains_prime_targets(subject):
+     subject = purify(subject)
+     jaro = textdistance.Jaro()
+     for w in subject.split():
+         
+         if ((jaro('bank',w)) >0.9 or (jaro('Paypal',w)) >0.9 or (jaro('ebay',w)) >0.9 or (jaro('amazon',w)) >0.9):
+            return 1
+     return 0
+
+def contains_account(subject):
+     subject = purify(subject)
+     jaro = textdistance.Jaro()
+     for w in subject.split():
+         
+         if (jaro('account',w)) >0.9 or jaro('profile',w) >0.9 or jaro('handle',w) >0.9 :
+            return 1
+     return 0
+    
+def contains_suspended(subject):
+     subject = purify(subject)
+     jaro = textdistance.Jaro()
+     for w in subject.split():
+         
+         if (((jaro('closed',w)) or jaro('expiration',w))or jaro('suspended',w)) >0.9 or jaro('terminate',w) >0.9 or jaro('restricted',w) >0.9:
+            return 1
+     return 0
+
+def contains_password(subject):
+     subject = purify(subject)
+     jaro = textdistance.Jaro()
+     for w in subject.split():
+         
+         if (jaro('password',w)) >0.9 or jaro('credential',w) > 0.9:
+            return 1
+     return 0
+
+def contains_urgent(subject):
+    subject = purify(subject)
+    jaro = textdistance.Jaro()
+    for w in subject.split():
+        if (jaro('urgent',w)) >0.9 or jaro('immediate',w) >0.9:
+           return 1
+    return 0
+
+def purify(subject):
+    filtered = ""
+    word_tokens = word_tokenize(subject)
+    for w in word_tokens:
+         if w not in stop_words and w.isalpha():
+                   w = stemmer.stem(w)
+                   filtered+=(lemmatizer.lemmatize(w))
+                   filtered+=" "
+    return filtered
+
+############################## Sender's address features #############################
+
+def number_of_dots(headers):
+        try:
+            sender = headers["From"]
+        except KeyError as Argument:
+            sender = headers["from"]
+        return len(re.compile(r'\.',re.IGNORECASE).findall(sender))
+def number_of_dash(headers):
+        try:
+            sender = headers["From"]
+        except KeyError as Argument:
+            sender = headers["from"]
+        return len(re.compile(r'\-',re.IGNORECASE).findall(sender))
+
+################################# END FEATURES EXTRACTION ###################################
+
+def get_features(path):
+    mail = load_mail(path)
+    
+    parsed_mail = getMailBody(mail)
+    
+    mail_body = parsed_mail[0]
+    mail_subject = parsed_mail[1]
+    mail_headers = parsed_mail[2]
+    
+    urls = getURLs(mail_body)
+    feature = {}
+    
+    feature['has_html']= int(presenceHTML(mail)==True)
+    
+    feature['has_html_form']= int(presenceHTMLFORM(mail_body)==True)
+    
+    feature['has_html_frame']= int(presenceHTMLIFRAME(mail_body)==True)
+    
+    feature['presence_flash_content']= int(presenceFlashContent(mail_body)==True)
+    
+    feature['presence_general_salutation']= int(presenceGeneralSalutation(mail_body)==True)
+    
+    feature['presence_java_script']= int(presenceJavaScript(mail_body)==True)
+    
+    feature['mail_to']= int(mail_to(mail_body)==True)
+    
+    feature['popups']= popups(mail_body)
+    
+    feature['body_richness'] = body_richness(mail_body)
+    
+    feature['len']= len(urls)
+    
+    feature['malicious_url']= (maliciousURL(urls))
+    
+    feature['text_link_disparity']= textLinkDisparity(mail_body)
+    
+    feature['number_of_attachments'] = numberOfAttachments(mail)
+    
+    feature['i_pas_url'] = (IPasURL(urls))
+    
+    feature['hexadecimal_url'] = (hexadecimalURL(urls))
+    
+    feature['presence_bad_ranked_url'] = int(presenceBadRankedURL(urls)==True)
+    
+    feature['max_domains_counts'] = (maxDomainsCounts(urls))
+    
+    feature['at_in_url']= at_in_url(urls)
+    
+    feature['subject_richness'] = subject_richness(mail_subject)
+    
+    feature['is_forwarded_mail']= int(isForwardedMail(mail_subject)==True)
+    
+    feature['is_replied_mail']= int(isRepliedMail(mail_subject)==True)
+    
+    feature['contains_account']= int(contains_account(mail_subject)== True)
+    
+    feature['contains_verify']= int(contains_verify(mail_subject)==True)
+    
+    feature['contains_update']= int(contains_update(mail_subject)==True)
+    
+    feature['contains_prime_targets']= int(contains_prime_targets(mail_subject)==True)
+    
+    feature['contains_suspended']= int(contains_suspended(mail_subject)==True)
+    
+    feature['contains_password']= int(contains_password(mail_subject)==True)
+    
+    feature['contains_urgent']= int(contains_urgent(mail_subject)==True)
+    
+    feature['contains_access'] = int(contains_access(mail_subject)==True)
+    
+    feature['number_of_dots']= number_of_dots(mail_headers)
+    
+    feature['number_of_dash']= number_of_dash(mail_headers)
+    
+    return feature
