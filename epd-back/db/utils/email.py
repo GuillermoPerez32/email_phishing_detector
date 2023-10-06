@@ -507,3 +507,16 @@ def get_features(path):
     feature['number_of_dash']= number_of_dash(mail_headers)
     
     return feature
+
+def get_mail_data(path):
+    mail = load_mail(path)
+    
+    parsed_mail = get_mail_body(mail)
+
+    features = {}
+    
+    features['mail_body'] = parsed_mail[0]
+    features['mail_subject'] = parsed_mail[1]
+    features['mail_headers'] = parsed_mail[2]
+
+    return features

@@ -2,7 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.core.validators import FileExtensionValidator
 from django.utils.translation import gettext_lazy as _
-from .utils.email import get_features
+from .utils.email import get_features, get_mail_data, load_mail
 import uuid
 
 # Create your models here.
@@ -29,4 +29,9 @@ class Email(models.Model):
     @property
     def features(self):
         features = get_features(self.file.path)
+        return features
+    
+    @property
+    def data(self):
+        features = get_mail_data(self.file.path)
         return features
