@@ -14,6 +14,9 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.snowball import SnowballStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
+from keras.models import load_model
+
+model = load_model('model/model.h5')
 
 URLREGEX = r"^(https?|ftp)://[^\s/$.?#].[^\s]*$"
 URLREGEX_NOT_ALONE = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -573,6 +576,11 @@ def get_features(path):
     return feature
 
 
+def get_prediction_features(path):
+    all_features = get_features(path)
+    return [all_features[f] for f in TRAINING_FEATURES]
+
+
 def get_mail_data(path):
     mail = load_mail(path)
 
@@ -587,5 +595,7 @@ def get_mail_data(path):
     return features
 
 
-def predict():
-    return random.choice([True, False])
+def predict(features):
+    # TODO
+    # model.predict()
+    return random.choice(['yes', 'no'])

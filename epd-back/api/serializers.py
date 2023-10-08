@@ -4,10 +4,22 @@ from db.models import Email
 
 class EmailSerializer(serializers.ModelSerializer):
 
-    features = serializers.DictField()
-    data = serializers.DictField()
+    data = serializers.DictField(read_only=True)
 
     class Meta:
         model = Email
         fields = '__all__'
-        read_only_fields = ['uuid', 'date_created', 'features', 'data', 'phishing']
+        read_only_fields = ['uuid', 'date_created',
+                            'data', 'phishing']
+
+
+class EmailDetailSerializer(serializers.ModelSerializer):
+
+    features = serializers.DictField(read_only=True)
+    data = serializers.DictField(read_only=True)
+
+    class Meta:
+        model = Email
+        fields = '__all__'
+        read_only_fields = ['uuid', 'date_created',
+                            'features', 'data', 'phishing']
