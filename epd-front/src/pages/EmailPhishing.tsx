@@ -20,12 +20,12 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 const EmailPhishing = () => {
-  const [uploadEmail, { isSuccess, status, requestId }] =
+  const [uploadEmail, { isSuccess, requestId, isUninitialized }] =
     useUploadEmailMutation();
   const [snackOpen, setSnackOpen] = useState(false);
 
   useEffect(() => {
-    if (status !== "fulfilled" || status !== "rejected") {
+    if (!isUninitialized) {
       setSnackOpen(true);
     }
   }, [requestId]);
