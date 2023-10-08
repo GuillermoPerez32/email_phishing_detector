@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { Box, BoxProps } from "@mui/material";
-import {
-  useGetEmailsQuery,
-  // useUploadEmailMutation,
-  // useUploadEmailMutation,
-} from "../../services/email";
+import { useGetEmailsQuery } from "../../services/email";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -13,7 +9,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-// import { uploadEmail } from "../../helpers/uploadEmail";
+
 import moment from "moment";
 import {
   CancelOutlined,
@@ -21,6 +17,7 @@ import {
   PendingOutlined,
   Phishing,
 } from "@mui/icons-material";
+import { Email } from "../../types/email";
 
 const EmailsTable = ({ ...others }: BoxProps) => {
   const table = {
@@ -76,7 +73,7 @@ const EmailsTable = ({ ...others }: BoxProps) => {
               {rows !== undefined &&
                 rows
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => {
+                  .map((row: Email) => {
                     const icon =
                       row.phishing === "yes" ? (
                         <Phishing sx={{ color: "red" }} />

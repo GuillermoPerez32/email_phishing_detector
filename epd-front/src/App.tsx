@@ -6,6 +6,7 @@ import { PageInfo } from "./components/PageInfo";
 
 const App = () => {
   const theme = useTheme();
+
   return (
     <Box
       height="100%"
