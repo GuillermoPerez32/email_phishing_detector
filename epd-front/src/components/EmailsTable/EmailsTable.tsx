@@ -1,8 +1,8 @@
-import { DragEvent, useState } from "react";
+import { useState } from "react";
 import { Box, BoxProps } from "@mui/material";
 import {
   useGetEmailsQuery,
-  useUploadEmailMutation,
+  // useUploadEmailMutation,
   // useUploadEmailMutation,
 } from "../../services/email";
 import Paper from "@mui/material/Paper";
@@ -13,10 +13,9 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import { uploadEmail } from "../../helpers/uploadEmail";
+// import { uploadEmail } from "../../helpers/uploadEmail";
 import moment from "moment";
 import {
-  Cancel,
   CancelOutlined,
   CheckCircleOutlineRounded,
   PendingOutlined,
@@ -25,7 +24,7 @@ import {
 
 const EmailsTable = ({ ...others }: BoxProps) => {
   const table = {
-    header: ["from", "dest", "subject", "date", "phishing"],
+    header: ["FROM", "DEST", "SUBJECT", "DATE", "PHISHING"],
   };
 
   const [page, setPage] = useState(0);
@@ -33,22 +32,22 @@ const EmailsTable = ({ ...others }: BoxProps) => {
 
   const { data: rows } = useGetEmailsQuery("df");
 
-  const [uploadEmail] = useUploadEmailMutation();
+  // const [uploadEmail] = useUploadEmailMutation();
 
-  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-  };
+  // const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
+  //   event.preventDefault();
+  // };
 
-  const handleDrop = async (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const files = Array.from(event.dataTransfer.files);
+  // const handleDrop = async (event: DragEvent<HTMLDivElement>) => {
+  //   event.preventDefault();
+  //   const files = Array.from(event.dataTransfer.files);
 
-    files.map(async (file) => {
-      uploadEmail(file);
-    });
-  };
+  //   files.map(async (file) => {
+  //     uploadEmail(file);
+  //   });
+  // };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
   };
 
