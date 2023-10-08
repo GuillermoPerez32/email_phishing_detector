@@ -12,4 +12,4 @@ class EmailViewSet(viewsets.ModelViewSet):
     permission_classes = []
 
     def perform_create(self, serializer):
-        return serializer.save(phishing=predict())
+        serializer.save(phishing='pending')
