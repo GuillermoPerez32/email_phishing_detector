@@ -31,7 +31,7 @@ class Email(models.Model):
     def features(self):
         features = get_features(self.file.path)
         return features
-    
+
     @property
     def data(self):
         features = get_mail_data(self.file.path)
