@@ -14,25 +14,18 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { uploadEmail } from "../../helpers/uploadEmail";
-
-interface Column {
-  id: string;
-  label: string;
-  minWidth?: number;
-  align?: "right";
-  format?: (value: number) => string;
-}
+import moment from "moment";
+import {
+  Cancel,
+  CancelOutlined,
+  CheckCircleOutlineRounded,
+  PendingOutlined,
+  Phishing,
+} from "@mui/icons-material";
 
 const EmailsTable = ({ ...others }: BoxProps) => {
   const table = {
-    header: [
-      { id: "No", label: "No" },
-      { id: "sender", label: "sender" },
-      { id: "dest", label: "dest" },
-      { id: "subject", label: "subject" },
-      { id: "date_created", label: "date created" },
-      { id: "phishing", label: "phishing" },
-    ] as Column[],
+    header: ["from", "dest", "subject", "date", "phishing"],
   };
 
   const [page, setPage] = useState(0);
@@ -67,19 +60,15 @@ const EmailsTable = ({ ...others }: BoxProps) => {
   };
 
   return (
-    <Box {...others}>
+    <Box {...others} sx={{ userSelect: "none" }}>
       <Paper sx={{ width: "100%", overflow: "hidden" }}>
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
                 {table.header.map((column) => (
-                  <TableCell
-                    key={column.id}
-                    align={column.align}
-                    style={{ minWidth: column.minWidth }}
-                  >
-                    {column.label}
+                  <TableCell key={column} align="left">
+                    {column}
                   </TableCell>
                 ))}
               </TableRow>
@@ -89,23 +78,45 @@ const EmailsTable = ({ ...others }: BoxProps) => {
                 rows
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => {
+                    const icon =
+                      row.phishing === "yes" ? (
+                        <Phishing sx={{ color: "red" }} />
+                      ) : row.phishing === "no" ? (
+                        <CheckCircleOutlineRounded sx={{ color: "green" }} />
+                      ) : row.phishing === "error" ? (
+                        <CancelOutlined sx={{ color: "green" }} />
+                      ) : (
+                        <PendingOutlined sx={{ color: "yellow" }} />
+                      );
                     return (
                       <TableRow
+                        key={row.uuid}
                         hover
                         role="checkbox"
                         tabIndex={-1}
-                        key={row.uuid}
+                        sx={{ cursor: "pointer" }}
                       >
-                        {table.header.map((column) => {
-                          const value = row[""] as string;
-                          return (
-                            <TableCell key={column.id} align={column.align}>
-                              {column.format && typeof value === "number"
-                                ? column.format(value)
-                                : value}
-                            </TableCell>
-                          );
-                        })}
+                        <TableCell align="left">
+                          {row.data["mail_headers"]["From"]}
+                        </TableCell>
+                        <TableCell align="left">
+                          {row.data["mail_headers"]["To"]}
+                        </TableCell>
+                        <TableCell align="left">
+                          {row.data["mail_headers"]["Subject"].length > 100
+                            ? row.data["mail_headers"]["Subject"].slice(100) +
+                              "..."
+                            : row.data["mail_headers"]["Subject"]}
+                        </TableCell>
+                        <TableCell align="left">
+                          {moment(row.date_created).format("LLLL")}
+                        </TableCell>
+                        <TableCell align="center">
+                          <Box display="flex" alignItems="center">
+                            <Box>{icon}</Box>
+                            <Box>{row.phishing}</Box>
+                          </Box>
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -115,7 +126,7 @@ const EmailsTable = ({ ...others }: BoxProps) => {
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={rows?.length}
+          count={rows?.length ? rows?.length : 0}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
