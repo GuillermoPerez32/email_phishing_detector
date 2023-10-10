@@ -15,6 +15,7 @@ from nltk.corpus import stopwords
 from nltk.stem.snowball import SnowballStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
 from keras.models import load_model
+import pandas as pd
 
 model = load_model('model/model.h5')
 
@@ -578,6 +579,7 @@ def get_features(path):
 
 def get_prediction_features(path):
     all_features = get_features(path)
+    print([all_features[f] for f in TRAINING_FEATURES])
     return [all_features[f] for f in TRAINING_FEATURES]
 
 
@@ -598,4 +600,5 @@ def get_mail_data(path):
 def predict(features):
     # TODO
     # model.predict()
-    return random.choice(['yes', 'no'])
+    df_features = pd.DataFrame([features])
+    return 'yes' if model.predict(df_features)[0][0] > 0.5 else 'no'
