@@ -1,6 +1,9 @@
-import { useState } from "react";
-import { Box, BoxProps } from "@mui/material";
-import { useGetEmailsQuery } from "../../services/email";
+import React, { useState } from "react";
+import { Box, BoxProps, Menu, MenuItem, Typography } from "@mui/material";
+import {
+  useDeleteEmailMutation,
+  useGetEmailsQuery,
+} from "../../services/email";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -14,6 +17,7 @@ import moment from "moment";
 import {
   CancelOutlined,
   CheckCircleOutlineRounded,
+  Delete,
   PendingOutlined,
   Phishing,
 } from "@mui/icons-material";
@@ -24,25 +28,29 @@ const EmailsTable = ({ ...others }: BoxProps) => {
     header: ["FROM", "DEST", "SUBJECT", "DATE", "PHISHING"],
   };
 
+  const [selectedRow, setSelectedRow] = useState<Email | undefined>();
+  const [contextMenuPosition, setContextMenuPosition] = useState({
+    top: 0,
+    left: 0,
+  });
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  const [deleteEmail] = useDeleteEmailMutation();
+
   const { data: rows } = useGetEmailsQuery("df");
 
-  // const [uploadEmail] = useUploadEmailMutation();
+  const handleRowClick = (event: any, row: Email) => {
+    event.preventDefault(); // Prevent the default context menu
+    setSelectedRow(row);
+    setContextMenuPosition({ top: event.clientY, left: event.clientX });
+  };
 
-  // const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
-  //   event.preventDefault();
-  // };
-
-  // const handleDrop = async (event: DragEvent<HTMLDivElement>) => {
-  //   event.preventDefault();
-  //   const files = Array.from(event.dataTransfer.files);
-
-  //   files.map(async (file) => {
-  //     uploadEmail(file);
-  //   });
-  // };
+  const handleCloseContextMenu = () => {
+    setSelectedRow(undefined);
+    setContextMenuPosition({ top: 0, left: 0 });
+  };
 
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
@@ -53,6 +61,11 @@ const EmailsTable = ({ ...others }: BoxProps) => {
   ) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+  };
+
+  const handleEmailDelete = (e: any) => {
+    deleteEmail(selectedRow?.uuid);
+    handleCloseContextMenu();
   };
 
   return (
@@ -80,12 +93,14 @@ const EmailsTable = ({ ...others }: BoxProps) => {
                       ) : row.phishing === "no" ? (
                         <CheckCircleOutlineRounded sx={{ color: "green" }} />
                       ) : row.phishing === "error" ? (
-                        <CancelOutlined sx={{ color: "green" }} />
+                        <CancelOutlined sx={{ color: "tomato" }} />
                       ) : (
                         <PendingOutlined sx={{ color: "yellow" }} />
                       );
                     return (
                       <TableRow
+                        onContextMenu={(e) => handleRowClick(e, row)}
+                        selected={selectedRow === row}
                         key={row.uuid}
                         hover
                         role="checkbox"
@@ -128,6 +143,23 @@ const EmailsTable = ({ ...others }: BoxProps) => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
+        <Menu
+          open={contextMenuPosition.top !== 0}
+          onClose={handleCloseContextMenu}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            contextMenuPosition.top !== 0 && contextMenuPosition.left !== 0
+              ? { top: contextMenuPosition.top, left: contextMenuPosition.left }
+              : undefined
+          }
+        >
+          <MenuItem onClick={handleEmailDelete}>
+            <Box display="flex" alignItems="center" gap={2}>
+              <Delete color="error" />
+              <Typography color="error">Delete</Typography>
+            </Box>
+          </MenuItem>
+        </Menu>
       </Paper>
     </Box>
   );

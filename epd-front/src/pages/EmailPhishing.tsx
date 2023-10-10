@@ -20,7 +20,7 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 const EmailPhishing = () => {
-  const [uploadEmail, { isSuccess, requestId, isUninitialized }] =
+  const [uploadEmail, { isSuccess, requestId, isUninitialized, isLoading }] =
     useUploadEmailMutation();
   const [snackOpen, setSnackOpen] = useState(false);
 
@@ -65,10 +65,14 @@ const EmailPhishing = () => {
       >
         <Alert
           onClose={() => setSnackOpen(false)}
-          severity={isSuccess ? "success" : "error"}
+          severity={isSuccess ? "success" : isLoading ? "warning" : "error"}
           sx={{ width: "100%" }}
         >
-          {isSuccess ? "Success!" : "There was an error"}
+          {isSuccess
+            ? "Success!"
+            : isLoading
+            ? "Loading"
+            : "There was an error"}
         </Alert>
       </Snackbar>
     </Card>
