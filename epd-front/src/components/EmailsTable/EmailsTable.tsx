@@ -114,7 +114,7 @@ const EmailsTable = ({ ...others }: BoxProps) => {
                           {row.data["mail_headers"]["To"]}
                         </TableCell>
                         <TableCell align="left">
-                          {row.data["mail_headers"]["Subject"].length > 100
+                          {row.data["mail_headers"]["Subject"]?.length > 100
                             ? row.data["mail_headers"]["Subject"].slice(100) +
                               "..."
                             : row.data["mail_headers"]["Subject"]}
