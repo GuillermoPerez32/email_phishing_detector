@@ -66,8 +66,6 @@ const EmailsTable = ({ ...others }: BoxProps) => {
     return match;
   });
 
-  console.log(rows);
-
   const handleRowClick = (event: any, row: Email) => {
     event.preventDefault(); // Prevent the default context menu
     setSelectedRow(row);

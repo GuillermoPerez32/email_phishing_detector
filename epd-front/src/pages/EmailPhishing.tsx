@@ -70,8 +70,6 @@ const EmailPhishing = () => {
 
   const handleDragEnd = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    console.log("drag end");
-
     setDragging(false);
   };
 

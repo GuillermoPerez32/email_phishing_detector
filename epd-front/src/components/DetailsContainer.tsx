@@ -9,8 +9,6 @@ const DetailsContainer = () => {
 
   const features = data?.features;
 
-  console.log(features);
-
   useEffect(() => {
     refetch();
   }, [emailId]);
