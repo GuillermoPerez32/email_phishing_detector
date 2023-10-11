@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import { Card } from "./Card";
 import { Link } from "react-router-dom";
-import { Dashboard, Email, QueryStats } from "@mui/icons-material";
+import { Dashboard, Email } from "@mui/icons-material";
 
 export const SideBar = () => {
   return (

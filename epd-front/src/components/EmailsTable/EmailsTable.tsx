@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Box, BoxProps, Menu, Typography } from "@mui/material";
 import {
   useDeleteEmailMutation,
@@ -21,9 +21,11 @@ import {
   MoreVert,
   PendingOutlined,
   Phishing,
+  Preview,
 } from "@mui/icons-material";
 import { Email } from "../../types/email";
 import { MenuItem } from "./MenuItem";
+import { useAppStore } from "../../services/filter";
 
 const EmailsTable = ({ ...others }: BoxProps) => {
   const table = {
@@ -41,7 +43,30 @@ const EmailsTable = ({ ...others }: BoxProps) => {
 
   const [deleteEmail] = useDeleteEmailMutation();
 
-  const { data: rows } = useGetEmailsQuery("df");
+  const { data } = useGetEmailsQuery("df");
+
+  const filter = useAppStore((state) => state.filter);
+
+  useEffect(() => {
+    setPage(0);
+  }, [filter]);
+
+  const rows = data?.filter((email) => {
+    const filterData = ["From", "To", "Subject"];
+    let match = false;
+    filterData.forEach((filterParam) => {
+      if (
+        (email.data["mail_headers"][filterParam] as String)
+          ?.toLowerCase()
+          .includes(filter.toLowerCase())
+      )
+        match = true;
+    });
+    if (email.phishing.includes(filter)) match = true;
+    return match;
+  });
+
+  console.log(rows);
 
   const handleRowClick = (event: any, row: Email) => {
     event.preventDefault(); // Prevent the default context menu
@@ -65,12 +90,12 @@ const EmailsTable = ({ ...others }: BoxProps) => {
     setPage(0);
   };
 
-  const handleEmailDelete = (e: any) => {
+  const handleEmailDelete = () => {
     deleteEmail(selectedRow?.uuid);
     handleCloseContextMenu();
   };
 
-  const handleEmailPreview = (e: any) => {
+  const handleEmailPreview = () => {
     deleteEmail(selectedRow?.uuid);
     handleCloseContextMenu();
   };
@@ -161,7 +186,7 @@ const EmailsTable = ({ ...others }: BoxProps) => {
           }
         >
           <MenuItem onClick={handleEmailPreview}>
-            <Delete />
+            <Preview />
             <Typography>Preview</Typography>
           </MenuItem>
           <MenuItem onClick={handleEmailDelete}>

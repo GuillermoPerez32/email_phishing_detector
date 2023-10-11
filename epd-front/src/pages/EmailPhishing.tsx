@@ -1,9 +1,20 @@
 // import { useAppSelector } from "../app/hooks";
-import { Alert, Box, Button, Snackbar, styled } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  IconButton,
+  Snackbar,
+  styled,
+} from "@mui/material";
 import { Card } from "../components/Card";
 import EmailsTable from "../components/EmailsTable/EmailsTable";
-import { Add } from "@mui/icons-material";
-import { useUploadEmailMutation } from "../services/email";
+import { Add, Delete, Refresh } from "@mui/icons-material";
+import {
+  useDeleteEmailMutation,
+  useGetEmailsQuery,
+  useUploadEmailMutation,
+} from "../services/email";
 import { useEffect, useState } from "react";
 // import { uploadEmail } from "../../helpers/uploadEmail";
 
@@ -22,6 +33,8 @@ const VisuallyHiddenInput = styled("input")({
 const EmailPhishing = () => {
   const [uploadEmail, { isSuccess, requestId, isUninitialized, isLoading }] =
     useUploadEmailMutation();
+  const { data, refetch } = useGetEmailsQuery("df");
+  const [deleteEmail] = useDeleteEmailMutation();
   const [snackOpen, setSnackOpen] = useState(false);
   const [dragging, setDragging] = useState(false);
 
@@ -62,6 +75,11 @@ const EmailPhishing = () => {
     setDragging(false);
   };
 
+  const handleDeleteAll = () => {
+    data?.forEach((email) => deleteEmail(email.uuid));
+    refetch();
+  };
+
   // const handleButtonClick = (event: any) => {
   //   event.preventDefault();
   //   inputRef.current?.click();
@@ -75,9 +93,10 @@ const EmailPhishing = () => {
       onDrop={handleDrop}
       onDragEnd={handleDragEnd}
       boxSizing="content-box"
+      boxShadow="2px red"
       border={dragging ? "dashed" : "none"}
     >
-      <Box mb={3}>
+      <Box mb={3} display="flex" gap={4}>
         <Button
           component="label"
           variant="contained"
@@ -87,6 +106,18 @@ const EmailPhishing = () => {
           Add new Email
           <VisuallyHiddenInput onChange={handleFileChange} type="file" />
         </Button>
+        <Button
+          component="label"
+          variant="contained"
+          color="error"
+          startIcon={<Delete />}
+          onClick={handleDeleteAll}
+        >
+          Delete all
+        </Button>
+        <IconButton onClick={() => refetch()}>
+          <Refresh />
+        </IconButton>
       </Box>
       <EmailsTable />
       <Snackbar
