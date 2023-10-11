@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, BoxProps, Menu, MenuItem, Typography } from "@mui/material";
+import { Box, BoxProps, Menu, Typography } from "@mui/material";
 import {
   useDeleteEmailMutation,
   useGetEmailsQuery,
@@ -18,10 +18,12 @@ import {
   CancelOutlined,
   CheckCircleOutlineRounded,
   Delete,
+  MoreVert,
   PendingOutlined,
   Phishing,
 } from "@mui/icons-material";
 import { Email } from "../../types/email";
+import { MenuItem } from "./MenuItem";
 
 const EmailsTable = ({ ...others }: BoxProps) => {
   const table = {
@@ -35,7 +37,7 @@ const EmailsTable = ({ ...others }: BoxProps) => {
   });
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const [deleteEmail] = useDeleteEmailMutation();
 
@@ -64,6 +66,11 @@ const EmailsTable = ({ ...others }: BoxProps) => {
   };
 
   const handleEmailDelete = (e: any) => {
+    deleteEmail(selectedRow?.uuid);
+    handleCloseContextMenu();
+  };
+
+  const handleEmailPreview = (e: any) => {
     deleteEmail(selectedRow?.uuid);
     handleCloseContextMenu();
   };
@@ -99,7 +106,7 @@ const EmailsTable = ({ ...others }: BoxProps) => {
                       );
                     return (
                       <TableRow
-                        onContextMenu={(e) => handleRowClick(e, row)}
+                        onClick={(e) => handleRowClick(e, row)}
                         selected={selectedRow === row}
                         key={row.uuid}
                         hover
@@ -135,7 +142,7 @@ const EmailsTable = ({ ...others }: BoxProps) => {
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
+          rowsPerPageOptions={[25, 50, 100]}
           component="div"
           count={rows?.length ? rows?.length : 0}
           rowsPerPage={rowsPerPage}
@@ -153,11 +160,13 @@ const EmailsTable = ({ ...others }: BoxProps) => {
               : undefined
           }
         >
+          <MenuItem onClick={handleEmailPreview}>
+            <Delete />
+            <Typography>Preview</Typography>
+          </MenuItem>
           <MenuItem onClick={handleEmailDelete}>
-            <Box display="flex" alignItems="center" gap={2}>
-              <Delete color="error" />
-              <Typography color="error">Delete</Typography>
-            </Box>
+            <Delete color="error" />
+            <Typography color="error">Delete</Typography>
           </MenuItem>
         </Menu>
       </Paper>

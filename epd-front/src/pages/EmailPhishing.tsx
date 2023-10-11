@@ -23,6 +23,7 @@ const EmailPhishing = () => {
   const [uploadEmail, { isSuccess, requestId, isUninitialized, isLoading }] =
     useUploadEmailMutation();
   const [snackOpen, setSnackOpen] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
   useEffect(() => {
     if (!isUninitialized) {
@@ -38,13 +39,44 @@ const EmailPhishing = () => {
     }
   };
 
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const files = Array.from(event.dataTransfer.files);
+
+    files.map(async (file) => {
+      uploadEmail(file);
+    });
+
+    setDragging(false);
+  };
+
+  const handleDragEnd = async (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    console.log("drag end");
+
+    setDragging(false);
+  };
+
   // const handleButtonClick = (event: any) => {
   //   event.preventDefault();
   //   inputRef.current?.click();
   // };
 
   return (
-    <Card width="100%" height="70%" padding="24px">
+    <Card
+      height="70%"
+      padding="24px"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      onDragEnd={handleDragEnd}
+      boxSizing="content-box"
+      border={dragging ? "dashed" : "none"}
+    >
       <Box mb={3}>
         <Button
           component="label"

@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Card } from "./Card";
 import { Link } from "react-router-dom";
 import { Dashboard, Email, QueryStats } from "@mui/icons-material";
@@ -16,13 +16,10 @@ export const SideBar = () => {
         <img src="logo.png" alt="" width="30%" />
       </Box>
       <SideBarItem to="/" startIcon={<Dashboard />}>
-        Dashboard
+        <Typography variant="h6">Dashboard</Typography>
       </SideBarItem>
       <SideBarItem to="emails" startIcon={<Email />}>
-        Emails
-      </SideBarItem>
-      <SideBarItem to="metrics" startIcon={<QueryStats />}>
-        Metrics
+        <Typography variant="h6">Emails</Typography>
       </SideBarItem>
     </Card>
   );
