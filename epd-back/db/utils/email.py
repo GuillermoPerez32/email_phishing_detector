@@ -601,4 +601,6 @@ def predict(features):
     # TODO
     # model.predict()
     df_features = pd.DataFrame([features])
-    return 'yes' if model.predict(df_features)[0][0] > 0.5 else 'no'
+    prediction = model.predict(df_features)[0][0]
+    print(prediction)
+    return 'yes' if prediction > 0.5 else 'no'

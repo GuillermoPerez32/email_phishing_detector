@@ -42,7 +42,6 @@ class Email(models.Model):
     @property
     def predict_features(self):
         features = get_prediction_features(self.file.path)
-        print(features)
         return features
 
 
@@ -51,9 +50,7 @@ def make_prediction(sender, instance, created, **kwargs):
     if created:
         try:
             predict_features = instance.predict_features
-            print(predict_features)
             prediction = predict(predict_features)
-            print(prediction)
             instance.phishing = prediction
             instance.save()
         except Exception as e:
