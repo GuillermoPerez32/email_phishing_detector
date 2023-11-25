@@ -100,18 +100,6 @@ def get_mail_body(mail):
         subject = headers['Subject']
     return [mail_body, subject, headers]
 
-
-def cleanhtml(sentence):  # function to clean the word of any html-tags
-    cleanr = re.compile('<.*?>')
-    cleantext = re.sub(cleanr, ' ', sentence)
-    return cleantext
-
-
-def cleanpunc(sentence):  # function to clean the word of any punctuation or special characters
-    cleaned = re.sub(r'[?|!|\'|"|#]', r'', sentence)
-    cleaned = re.sub(r'[.|,|)|(|\|/]', r'', cleaned)
-    return cleaned
-
 ######################################### Mail features extraction #########################################
 
 
