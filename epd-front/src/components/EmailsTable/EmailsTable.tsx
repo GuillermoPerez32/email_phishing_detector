@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { Box, BoxProps, Menu, Typography } from "@mui/material";
+import { Box, BoxProps, Menu, Modal, Typography } from "@mui/material";
 import {
   useDeleteEmailMutation,
   useGetEmailsQuery,
@@ -26,6 +26,7 @@ import {
 import { Email } from "../../types/email";
 import { MenuItem } from "./MenuItem";
 import { useAppStore } from "../../services/filter";
+import EmailPreview from "../EmailPreview";
 
 const EmailsTable = ({ ...others }: BoxProps) => {
   const table = {
@@ -37,6 +38,8 @@ const EmailsTable = ({ ...others }: BoxProps) => {
     top: 0,
     left: 0,
   });
+
+  const [showPreview, setshowPreview] = useState(false);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
@@ -94,8 +97,7 @@ const EmailsTable = ({ ...others }: BoxProps) => {
   };
 
   const handleEmailPreview = () => {
-    deleteEmail(selectedRow?.uuid);
-    handleCloseContextMenu();
+    setshowPreview(true);
   };
 
   return (
@@ -193,6 +195,12 @@ const EmailsTable = ({ ...others }: BoxProps) => {
           </MenuItem>
         </Menu>
       </Paper>
+      <EmailPreview
+        subject={selectedRow?.data["mail_headers"]["Subject"]}
+        body={selectedRow?.data["mail_body"]}
+        open={showPreview}
+        handleClose={() => setshowPreview(false)}
+      ></EmailPreview>
     </Box>
   );
 };
