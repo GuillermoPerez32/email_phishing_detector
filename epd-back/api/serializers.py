@@ -23,3 +23,10 @@ class EmailDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['uuid', 'date_created',
                             'features', 'data', 'phishing']
+
+
+class MetricsSerializer(serializers.Serializer):
+
+    total_phishing = serializers.IntegerField(read_only=True)
+    total_not_phishing = serializers.IntegerField(read_only=True)
+    total = serializers.IntegerField(read_only=True)
