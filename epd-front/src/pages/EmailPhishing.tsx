@@ -95,25 +95,19 @@ const EmailPhishing = () => {
       border={dragging ? "dashed" : "none"}
     >
       <Box mb={3} display="flex" gap={4}>
-        <Button
-          component="label"
-          variant="contained"
-          color="success"
-          startIcon={<Add />}
-        >
+        <Button component="label" color="success" startIcon={<Add />}>
           Add new Email
           <VisuallyHiddenInput onChange={handleFileChange} type="file" />
         </Button>
         <Button
           component="label"
-          variant="contained"
           color="error"
           startIcon={<Delete />}
           onClick={handleDeleteAll}
         >
           Delete all
         </Button>
-        <IconButton onClick={() => refetch()}>
+        <IconButton onClick={() => refetch()} sx={{ ml: "auto" }}>
           <Refresh />
         </IconButton>
       </Box>

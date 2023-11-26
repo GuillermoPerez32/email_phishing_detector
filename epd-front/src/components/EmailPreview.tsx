@@ -13,7 +13,8 @@ import React from "react";
 
 type Props = {
   open: boolean;
-  handleClose: any;
+  onClose: any;
+  onDelete: any;
   subject: string;
   body: string;
 };
@@ -27,14 +28,20 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const EmailPreview = ({ handleClose, open, body, subject }: Props) => {
+const EmailPreview = ({ onClose, onDelete, open, body, subject }: Props) => {
+  const handleDelete = () => {
+    onDelete();
+    onClose();
+  };
+
   return (
     <Dialog
       open={open}
       TransitionComponent={Transition}
       keepMounted
-      onClose={handleClose}
+      onClose={onClose}
       aria-describedby="alert-dialog-slide-description"
+      maxWidth="lg"
     >
       <DialogTitle>{subject}</DialogTitle>
       <Divider />
@@ -44,7 +51,10 @@ const EmailPreview = ({ handleClose, open, body, subject }: Props) => {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Exit</Button>
+        <Button onClick={handleDelete} color="error">
+          Delete
+        </Button>
+        <Button onClick={onClose}>Exit</Button>
       </DialogActions>
     </Dialog>
   );

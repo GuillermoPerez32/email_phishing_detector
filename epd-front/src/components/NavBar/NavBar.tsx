@@ -1,6 +1,5 @@
-import { Avatar, Box, Grid } from "@mui/material";
+import { Avatar, Grid } from "@mui/material";
 import { Card } from "../Card";
-import FilterButton from "./FilterButton";
 import { deepOrange } from "@mui/material/colors";
 import { SearchInput } from "./SearchInput";
 
@@ -9,8 +8,6 @@ export const NavBar = () => {
     <Card width="auto" paddingX={6} paddingY={5}>
       <Grid container>
         <Grid item sm={8} display="flex" alignItems="center">
-          <FilterButton />
-          <Box width={20} />
           <SearchInput />
         </Grid>
         <Grid

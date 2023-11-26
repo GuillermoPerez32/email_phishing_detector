@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { Box, BoxProps, Menu, Modal, Typography } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, BoxProps } from "@mui/material";
 import {
   useDeleteEmailMutation,
   useGetEmailsQuery,
@@ -17,14 +17,10 @@ import moment from "moment";
 import {
   CancelOutlined,
   CheckCircleOutlineRounded,
-  Delete,
-  MoreVert,
   PendingOutlined,
   Phishing,
-  Preview,
 } from "@mui/icons-material";
 import { Email } from "../../types/email";
-import { MenuItem } from "./MenuItem";
 import { useAppStore } from "../../services/filter";
 import EmailPreview from "../EmailPreview";
 
@@ -34,10 +30,6 @@ const EmailsTable = ({ ...others }: BoxProps) => {
   };
 
   const [selectedRow, setSelectedRow] = useState<Email | undefined>();
-  const [contextMenuPosition, setContextMenuPosition] = useState({
-    top: 0,
-    left: 0,
-  });
 
   const [showPreview, setshowPreview] = useState(false);
 
@@ -72,12 +64,6 @@ const EmailsTable = ({ ...others }: BoxProps) => {
   const handleRowClick = (event: any, row: Email) => {
     event.preventDefault(); // Prevent the default context menu
     setSelectedRow(row);
-    setContextMenuPosition({ top: event.clientY, left: event.clientX });
-  };
-
-  const handleCloseContextMenu = () => {
-    setSelectedRow(undefined);
-    setContextMenuPosition({ top: 0, left: 0 });
   };
 
   const handleChangePage = (_: unknown, newPage: number) => {
@@ -93,11 +79,17 @@ const EmailsTable = ({ ...others }: BoxProps) => {
 
   const handleEmailDelete = () => {
     deleteEmail(selectedRow?.uuid);
-    handleCloseContextMenu();
   };
 
-  const handleEmailPreview = () => {
-    setshowPreview(true);
+  useEffect(() => {
+    if (selectedRow !== undefined) {
+      setshowPreview(true);
+    }
+  }, [selectedRow]);
+
+  const handleExitPreview = () => {
+    setSelectedRow(undefined);
+    setshowPreview(false);
   };
 
   return (
@@ -175,31 +167,13 @@ const EmailsTable = ({ ...others }: BoxProps) => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-        <Menu
-          open={contextMenuPosition.top !== 0}
-          onClose={handleCloseContextMenu}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            contextMenuPosition.top !== 0 && contextMenuPosition.left !== 0
-              ? { top: contextMenuPosition.top, left: contextMenuPosition.left }
-              : undefined
-          }
-        >
-          <MenuItem onClick={handleEmailPreview}>
-            <Preview />
-            <Typography>Preview</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleEmailDelete}>
-            <Delete color="error" />
-            <Typography color="error">Delete</Typography>
-          </MenuItem>
-        </Menu>
       </Paper>
       <EmailPreview
         subject={selectedRow?.data["mail_headers"]["Subject"]}
         body={selectedRow?.data["mail_body"]}
         open={showPreview}
-        handleClose={() => setshowPreview(false)}
+        onClose={handleExitPreview}
+        onDelete={handleEmailDelete}
       ></EmailPreview>
     </Box>
   );
