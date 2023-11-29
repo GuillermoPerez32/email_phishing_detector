@@ -52,7 +52,7 @@ export const Home = () => {
           <MetricElement isLoading={isLoading} value={totalNotPhishing} />
         </Box>
       </Card>
-      <Card width="100%" padding="24px">
+      <Card width="100%" padding="24px" mt={6}>
         <ResponsiveContainer height={300}>
           <LineChart data={phishingData}>
             <CartesianGrid strokeDasharray="3 3" />
